@@ -120,5 +120,4 @@ def capture_video(cap, video_base_directory, timezone, frame_width, frame_height
         subject = 'Error capturing video'
         body = f"Error capturing video: {e}"
         send_email(subject, body)
-
-        # Return None for
+        return None, None
