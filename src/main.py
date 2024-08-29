@@ -47,12 +47,12 @@ def main_loop():
         send_email('RTSP stream error', 'The RTSP stream could not be opened. Please check the connection.')
         cap.release()
         exit(0)
-
-    cap.release()
     # Video settings
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
     fps = int(config['camera']['fps'])
+
+    cap.release()
 
     # Directories and database path
     image_base_directory = config['directories']['image_base_directory']
