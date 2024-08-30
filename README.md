@@ -21,7 +21,7 @@ The system captures images and videos, stores them locally, and uploads them to 
 
 ```bash
 git clone https://github.com/hydrocam/collector
-cd streamflow-monitoring
+cd collector
 ```
 ### Install Required Libraries
 
@@ -38,5 +38,5 @@ pip install -r requirements.txt
 
 ## Configuration
 
-You can configure various parameters (e.g.cloud storage preferences, camerea address) by editing the configuration file (config.json).
+You can configure various parameters (e.g.cloud storage preferences, camerea address) by editing the configuration file (config.ini).
 
