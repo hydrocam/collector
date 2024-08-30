@@ -17,16 +17,26 @@ The system captures images and videos, stores them locally, and uploads them to 
 - **`config.ini`**: Configuration file containing settings for cloud storage, email notifications, and other parameters.
 
 ## Installation
+- Clone the repository:
 
-### Prerequisites
-
-- Python 3.x
-- A Raspberry Pi (or other system for capturing images and videos)
-
+```bash
+git clone https://github.com/hydrocam/collector
+cd streamflow-monitoring
+```
 ### Install Required Libraries
 
 Run the following command to install the required Python libraries:
 
 ```bash
 pip install -r requirements.txt
+```
+
+### Prerequisites
+
+- Python 3.x
+- A Raspberry Pi (or other system for capturing images and videos)
+
+## Configuration
+
+You can configure various parameters (e.g.cloud storage preferences, camerea address) by editing the configuration file (config.json).
 
