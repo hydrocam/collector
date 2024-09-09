@@ -40,3 +40,6 @@ pip install -r requirements.txt
 
 You can configure various parameters (e.g.cloud storage preferences, camerea address) by editing the configuration file (config.ini).
 
+## Funding and Acknowledgments
+
+Funding for this project was provided by the National Oceanic & Atmospheric Administration (NOAA), awarded to the Cooperative Institute for Research to Operations in Hydrology (CIROH) through the NOAA Cooperative Agreement with The University of Alabama (NA22NWS4320003). Utah State University is a founding member of CIROH and receives funding under subaward from the University of Alabama. Additional funding and support have been provided by the Utah Water Research laboratory at Utah State University.
