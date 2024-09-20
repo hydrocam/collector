@@ -76,6 +76,10 @@ def send_email(subject, body):
     This function uses AWS Simple Email Service (SES) to send an email. The configuration details
     (AWS credentials and email addresses) are read from a 'config.ini' file.
     """
+    if not check_internet_connectivity():
+        print("No Internet connectivity.")
+        return
+        
     config = configparser.ConfigParser()
     config.read('config.ini')
 
