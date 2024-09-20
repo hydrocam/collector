@@ -158,7 +158,7 @@ def main_loop():
         except Exception as e:
             logging.error(f"An error occurred during the main loop: {e}")
             send_email('An error occurred during the main loop', f'An error occurred during the main loop: {e}')
-            exit(0)
+            logging.info("Continuing with the next iteration despite the error.")
 
         logging.info('\n -------------Starting a new cycle ------------\n')
 
