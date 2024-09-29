@@ -40,6 +40,26 @@ pip install -r requirements.txt
 
 You can configure various parameters (e.g.cloud storage preferences, camerea address) by editing the configuration file (config.ini).
 
+### Running the Script at Reboot on Raspberry Pi
+
+To ensure that the start_script.sh runs automatically every time the Raspberry Pi reboots, follow these steps:
+### 1. Edit the Root User's Crontab
+Open the terminal and execute the following command:
+```bash
+sudo crontab -e
+```
+You might get an option like this when running this command for first time:
+![image](https://github.com/user-attachments/assets/ce9691ea-9ffe-4a04-8d67-e2a0c6dc34a7)
+
+Select 1 (nano) as our terminal editor.
+### 2. Add the Script to Run at Reboot
+In the crontab editor, add the following line at last to schedule your script to run at every reboot:
+```bash
+@reboot bash /path/to/cloned/repo/folder/collector/start_script.sh
+```
+#### Note:
+Replace /path/to/cloned/repo/ with the actual path where your repository is cloned.
+
 ## Funding and Acknowledgments
 
 Funding for this project was provided by the National Oceanic & Atmospheric Administration (NOAA), awarded to the Cooperative Institute for Research to Operations in Hydrology (CIROH) through the NOAA Cooperative Agreement with The University of Alabama (NA22NWS4320003). Utah State University is a founding member of CIROH and receives funding under subaward from the University of Alabama. Additional funding and support have been provided by the Utah Water Research laboratory at Utah State University.
