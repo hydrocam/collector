@@ -16,14 +16,36 @@ The system captures images and videos, stores them locally, and uploads them to 
 - **`utils.py`**: Provides utility functions such as calculating the next capture time, generating MD5 checksums, and checking data integrity.
 - **`config.ini`**: Configuration file containing settings for cloud storage, email notifications, and other parameters.
 
+
 ## Installation
-- Clone the repository:
+
+### 1. Set up Virtual Environment
+
+To create and activate a virtual environment for the project, follow these steps:
+Step 1: Navigate to the Project Directory
+Open your terminal and change to the project directory:
+```bash
+cd /path/to/folder/for/venv
+```
+Step 2: Create a Virtual Environment
+Run the following command to create a virtual environment named collectorenv:
+```bash
+python3 -m venv collectorenv
+```
+Step 3: Activate the Virtual Environment
+Activate the virtual environment using the following command:
+```bash
+source collectorenv/bin/activate
+```
+
+### 2. Clone the repository:
 
 ```bash
 git clone https://github.com/hydrocam/collector
 cd collector
 ```
-### Install Required Libraries
+
+### 3. Install Required Libraries
 
 Run the following command to install the required Python libraries:
 
@@ -31,7 +53,7 @@ Run the following command to install the required Python libraries:
 pip install -r requirements.txt
 ```
 
-### Prerequisites
+### 4. Prerequisites
 
 - Python 3.x
 - A Raspberry Pi (or other system for capturing images and videos)
@@ -43,7 +65,7 @@ You can configure various parameters (e.g.cloud storage preferences, camerea add
 ### Running the Script at Reboot on Raspberry Pi
 
 To ensure that the start_script.sh runs automatically every time the Raspberry Pi reboots, follow these steps:
-### 1. Edit the Root User's Crontab
+#### 1. Edit the Root User's Crontab
 Open the terminal and execute the following command:
 ```bash
 sudo crontab -e
@@ -52,12 +74,12 @@ You might get an option like this when running this command for first time:
 ![image](https://github.com/user-attachments/assets/ce9691ea-9ffe-4a04-8d67-e2a0c6dc34a7)
 
 Select 1 (nano) as our terminal editor.
-### 2. Add the Script to Run at Reboot
+#### 2. Add the Script to Run at Reboot
 In the crontab editor, add the following line at last to schedule your script to run at every reboot:
 ```bash
 @reboot bash /path/to/cloned/repo/folder/collector/start_script.sh
 ```
-#### Note:
+##### Note:
 Replace /path/to/cloned/repo/ with the actual path where your repository is cloned.
 
 ## Funding and Acknowledgments
