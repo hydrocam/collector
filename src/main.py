@@ -61,13 +61,19 @@ def main_loop():
 
     # Run the database initialization
     initialize_database(db_path=db_path)
+    current_day = datetime.now(mst).strftime('%Y-%m-%d')
+    log_file = os.path.join(log_directory, f'app_{current_day}.log')
+    logging.basicConfig(filename=log_file, level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
 
     while True:
-        today = datetime.now(mst).strftime('%Y-%m-%d')
+      today = datetime.now(mst).strftime('%Y-%m-%d')
+      if today != current_day:
+        for handler in logging.root.handlers[:]:
+          logging.root.removeHandler(handler)
         log_file = os.path.join(log_directory, f'app_{today}.log')
-        logging.basicConfig(filename=log_file,
-                            level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        current_day = today
 
         now = datetime.now(mst)
         # Wait until the next capture time
