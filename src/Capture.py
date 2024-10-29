@@ -32,7 +32,6 @@ def capture_image(rtsp_url, image_base_directory, timezone):
 
         # Capture a single frame from the RTSP stream and save it as an image
         ffmpeg.input(rtsp_url, rtsp_transport='tcp').output(image_path, vframes=1, qscale=2).run()
-
         # Return the path and filename of the saved image
         return image_path, image_filename
 
