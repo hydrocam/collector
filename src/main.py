@@ -1,7 +1,6 @@
 import configparser
 import pytz
 import os
-import cv2
 import boto3
 import sqlite3
 import logging
@@ -39,20 +38,20 @@ def main_loop():
     GCP_video_bucket_name = config['gcp']['video_bucket_name'] if gcp_upload else None
     gcs_client = storage.Client.from_service_account_json(config['gcp']['service_account_json']) if gcp_upload else None
 
-    camera_address = config['camera']['address']
-    os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;tcp'
-    cap = cv2.VideoCapture(camera_address, cv2.CAP_FFMPEG)
+    rtsp_url = config['camera']['address']
+    # os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;tcp'
+    # cap = cv2.VideoCapture(camera_address, cv2.CAP_FFMPEG)
 
-    if not cap.isOpened():
-        send_email('RTSP stream error', 'The RTSP stream could not be opened. Please check the connection.')
-        cap.release()
-        exit(0)
-    # Video settings
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-    fps = int(config['camera']['fps'])
+    # if not cap.isOpened():
+    #     send_email('RTSP stream error', 'The RTSP stream could not be opened. Please check the connection.')
+    #     cap.release()
+    #     exit(0)
+    # # Video settings
+    # frame_width = int(cap.get(3))
+    # frame_height = int(cap.get(4))
+    # fps = int(config['camera']['fps'])
 
-    cap.release()
+    # cap.release()
 
     # Directories and database path
     image_base_directory = config['directories']['image_base_directory']
@@ -97,7 +96,7 @@ def main_loop():
         video_path, video_filename = capture_video(cap, video_base_directory, mst, frame_width,
                                                    frame_height, fps, duration=40)
 
-        cap.release()
+        
         time.sleep(20)
 
         # Extract year and month from the filename for folder structure
