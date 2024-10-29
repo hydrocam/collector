@@ -31,13 +31,21 @@ def capture_image(rtsp_url, image_base_directory, timezone):
         image_path = os.path.join(image_base_directory, image_filename)
 
         # Capture a single frame from the RTSP stream and save it as an image
-        ffmpeg.input(rtsp_url, rtsp_transport='tcp').output(image_path, vframes=1, qscale=2).run()
+        ffmpeg.input(rtsp_url, rtsp_transport='tcp')\
+              .output(image_path, vframes=1, qscale=2)\
+              .overwrite_output()\
+              .run(capture_stdout=True, capture_stderr=True)
+
         # Return the path and filename of the saved image
         return image_path, image_filename
 
+    except ffmpeg.Error as e:
+        logging.error(f"Error capturing image: {e.stderr.decode()}")
+        send_email('Error capturing image', f"Error capturing image: {e.stderr.decode()}")
+        return None, None
     except Exception as e:
-        logging.error(f"Error capturing image: {e}")
-        send_email('Error capturing image', f"Error capturing image: {e}")
+        logging.error(f"Unexpected error: {e}")
+        send_email('Unexpected error during image capture', f"Unexpected error: {e}")
         return None, None
 
 
@@ -68,12 +76,19 @@ def capture_video(rtsp_url, video_base_directory, timezone, duration=40):
         video_path = os.path.join(video_base_directory, video_filename)
 
         # Capture video from the RTSP stream for the specified duration
-        ffmpeg.input(rtsp_url, rtsp_transport='tcp').output(video_path, vcodec='copy', t=duration).run()
+        ffmpeg.input(rtsp_url, rtsp_transport='tcp')\
+              .output(video_path, vcodec='copy', t=duration)\
+              .overwrite_output()\
+              .run(capture_stdout=True, capture_stderr=True)
 
         # Return the path and filename of the saved video
         return video_path, video_filename
 
+    except ffmpeg.Error as e:
+        logging.error(f"Error capturing video: {e.stderr.decode()}")
+        send_email('Error capturing video', f"Error capturing video: {e.stderr.decode()}")
+        return None, None
     except Exception as e:
-        logging.error(f"Error capturing video: {e}")
-        send_email('Error capturing video', f"Error capturing video: {e}")
+        logging.error(f"Unexpected error: {e}")
+        send_email('Unexpected error during video capture', f"Unexpected error: {e}")
         return None, None
