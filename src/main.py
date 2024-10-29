@@ -74,71 +74,86 @@ def main_loop():
 
         time.sleep(20)
 
-        # Extract year and month from the filename for folder structure
-        _, year, month = extract_datetime_from_filename(image_filename)
+        if not image_filename or video_filename:
+            if not image_filename:
+                logging.info('Retrying Capturing Image')
+                image_path, image_filename = capture_image(rtsp_url, image_base_directory, timezone=mst)
+            if not video_filename:
+                logging.info('Retrying Capturing Video')
+                video_path, video_filename = capture_video(rtsp_url, video_base_directory, mst, duration=40)
 
-        try:
-            with sqlite3.connect(db_path) as conn:
-                cursor = conn.cursor()
+        if image_filename or video_filename:
+            # Extract year and month from the filename for folder structure
+            if image_filename:
+                _, year, month = extract_datetime_from_filename(image_filename)
+            else:
+                _, year, month = extract_datetime_from_filename(video_filename)
 
-                # Insert records into the database
-                execute_db_operation(insert_file_record, cursor, image_filename, 'image', image_path)
-                execute_db_operation(insert_file_record, cursor, video_filename, 'video', video_path)
+            try:
+                with sqlite3.connect(db_path) as conn:
+                    cursor = conn.cursor()
 
-                # Upload paths for S3 and GCS
-                s3_image_path = f"{year}/{month}/{image_filename}"
-                s3_video_path = f"{year}/{month}/{video_filename}"
-                gcs_image_path = f"{year}/{month}/{image_filename}"
-                gcs_video_path = f"{year}/{month}/{video_filename}"
+                    if image_filename:
+                        execute_db_operation(insert_file_record, cursor, image_filename, 'image', image_path)
+                    if video_filename:
+                        execute_db_operation(insert_file_record, cursor, video_filename, 'video', video_path)
 
-                # Check for internet connectivity
-                if not check_internet_connectivity():
-                    print("No Internet connectivity. Reconnecting to Wi-Fi...")
-                    disconnect_current_wifi()
-                    time.sleep(120)
+                    # Upload paths for S3 and GCS
+                    s3_image_path = f"{year}/{month}/{image_filename}"
+                    s3_video_path = f"{year}/{month}/{video_filename}"
+                    gcs_image_path = f"{year}/{month}/{image_filename}"
+                    gcs_video_path = f"{year}/{month}/{video_filename}"
 
-                    # Recheck the internet connectivity after attempting to reconnect
+                    # Check for internet connectivity
                     if not check_internet_connectivity():
-                        print("Reconnection failed. Skipping upload and continuing the loop...")
-                        continue  # Skip to the next iteration of the loop
+                        logging.info("No Internet connectivity. Reconnecting to Wi-Fi...")
+                        disconnect_current_wifi()
+                        time.sleep(120)
 
-                # If the internet is working, proceed with the upload tasks
-                logging.info("Internet is working.")
+                        # Recheck the internet connectivity after attempting to reconnect
+                        if not check_internet_connectivity():
+                            logging.info("Reconnection failed. Skipping upload and continuing the loop...")
+                            continue  # Skip to the next iteration of the loop
 
-                # Upload image to S3 and GCP
-                aws_uploaded, dataintegrityAWS, gcp_uploaded, dataintegrityGCP = upload_files_to_cloud(
-                    image_path, image_filename, AWS_image_bucket_name, GCP_image_bucket_name, aws_upload, gcp_upload, s3_client, gcs_client)
+                    # If the internet is working, proceed with the upload tasks
+                    logging.info("Internet is working.")
 
-                if aws_uploaded:
-                    execute_db_operation(update_file_record_aws, cursor, image_filename, s3_image_path,
-                                         AWS_image_bucket_name, dataintegrityAWS)
-                if gcp_uploaded:
-                    execute_db_operation(update_file_record_gcp, cursor, image_filename, gcs_image_path,
-                                         GCP_image_bucket_name, dataintegrityGCP)
+                    # Upload image to S3 and GCP
+                    if image_filename:
+                        aws_uploaded, dataintegrityAWS, gcp_uploaded, dataintegrityGCP = upload_files_to_cloud(
+                            image_path, image_filename, AWS_image_bucket_name, GCP_image_bucket_name, aws_upload, gcp_upload, s3_client, gcs_client)
 
-                # Upload Video to S3 and GCP
-                aws_uploaded, dataintegrityAWS, gcp_uploaded, dataintegrityGCP = upload_files_to_cloud(
-                    video_path, video_filename, AWS_video_bucket_name, GCP_video_bucket_name, aws_upload, gcp_upload, s3_client, gcs_client)
+                        if aws_uploaded:
+                            execute_db_operation(update_file_record_aws, cursor, image_filename, s3_image_path,
+                                                 AWS_image_bucket_name, dataintegrityAWS)
+                        if gcp_uploaded:
+                            execute_db_operation(update_file_record_gcp, cursor, image_filename, gcs_image_path,
+                                                 GCP_image_bucket_name, dataintegrityGCP)
 
-                if aws_uploaded:
-                    execute_db_operation(update_file_record_aws, cursor, video_filename, s3_video_path,
-                                         AWS_video_bucket_name, dataintegrityAWS)
-                if gcp_uploaded:
-                    execute_db_operation(update_file_record_gcp, cursor, video_filename, gcs_video_path,
-                                         GCP_video_bucket_name, dataintegrityGCP)
+                    # Upload Video to S3 and GCP
+                    if video_filename:
+                        aws_uploaded, dataintegrityAWS, gcp_uploaded, dataintegrityGCP = upload_files_to_cloud(
+                            video_path, video_filename, AWS_video_bucket_name, GCP_video_bucket_name, aws_upload, gcp_upload, s3_client, gcs_client)
 
-                # Upload any unuploaded files
-                upload_unuploaded_files(cursor, AWS_image_bucket_name, AWS_video_bucket_name, GCP_image_bucket_name,
-                                        GCP_video_bucket_name, s3_client, gcs_client, aws_upload, gcp_upload)
+                        if aws_uploaded:
+                            execute_db_operation(update_file_record_aws, cursor, video_filename, s3_video_path,
+                                                 AWS_video_bucket_name, dataintegrityAWS)
+                        if gcp_uploaded:
+                            execute_db_operation(update_file_record_gcp, cursor, video_filename, gcs_video_path,
+                                                 GCP_video_bucket_name, dataintegrityGCP)
 
-                # Clean up old files at a specific time
-                if now.hour == 23 and now.minute < 30:
-                    delete_old_files(cursor, timezone=mst, days_old=30, aws_upload=aws_upload, gcp_upload=gcp_upload)
+                    # Upload any unuploaded files
+                    upload_unuploaded_files(cursor, AWS_image_bucket_name, AWS_video_bucket_name, GCP_image_bucket_name,
+                                            GCP_video_bucket_name, s3_client, gcs_client, aws_upload, gcp_upload)
 
-        except Exception as e:
-            logging.error(f"An error occurred during the main loop: {e}")
-            send_email('An error occurred during the main loop', f'An error occurred during the main loop: {e}')
-            logging.info("Continuing with the next iteration despite the error.")
+                    # Clean up old files at a specific time
+                    if now.hour == 23 and now.minute < 30:
+                        delete_old_files(cursor, timezone=mst, days_old=30, aws_upload=aws_upload, gcp_upload=gcp_upload)
+
+            except Exception as e:
+                logging.error(f"An error occurred during the main loop: {e}")
+                send_email('An error occurred during the main loop', f'An error occurred during the main loop: {e}')
+                logging.info("Continuing with the next iteration despite the error.")
 
         logging.info('\n -------------Starting a new cycle ------------\n')
 
