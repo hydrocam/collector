@@ -76,10 +76,12 @@ def capture_video(rtsp_url, video_base_directory, timezone, duration=40):
         video_path = os.path.join(video_base_directory, video_filename)
 
         # Capture video from the RTSP stream for the specified duration
+        logging.info(f"Capturing video at {video_path}")
         ffmpeg.input(rtsp_url, rtsp_transport='tcp')\
               .output(video_path, vcodec='copy', t=duration)\
               .overwrite_output()\
               .run(capture_stdout=True, capture_stderr=True)
+        logging.info(f"Finished Capturing video at {video_path}")
 
         # Return the path and filename of the saved video
         return video_path, video_filename
