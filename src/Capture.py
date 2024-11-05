@@ -39,8 +39,8 @@ def capture_image(rtsp_url, image_base_directory, timezone):
         return image_path, image_filename
 
     except ffmpeg.Error as e:
-        logging.error(f"Error capturing image: {e.stderr.decode()}")
-        send_email('Error capturing image', f"Error capturing image: {e.stderr.decode()}")
+        logging.error(f"Error capturing image: {e}")
+        send_email('Error capturing image', f"Error capturing image: {e}")
         return None, None
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
@@ -85,8 +85,8 @@ def capture_video(rtsp_url, video_base_directory, timezone, duration=40):
         return video_path, video_filename
 
     except ffmpeg.Error as e:
-        logging.error(f"Error capturing video: {e.stderr.decode()}")
-        send_email('Error capturing video', f"Error capturing video: {e.stderr.decode()}")
+        logging.error(f"Error capturing video: {e}")
+        send_email('Error capturing video', f"Error capturing video: {e}")
         return None, None
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
