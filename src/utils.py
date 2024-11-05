@@ -70,7 +70,7 @@ def get_next_capture_time(mst):
     now = datetime.now(mst)
 
     # Calculate the next 30-minute interval
-    minutes = (now.minute // 30 + 1) * 30
+    minutes = 60
     next_capture = now.replace(minute=0, second=0, microsecond=0) + timedelta(minutes=minutes)
 
     # If the calculated time is earlier than or equal to the current time (in case now is exactly at the start of a 30-minute interval)
