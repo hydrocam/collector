@@ -69,8 +69,8 @@ def get_next_capture_time(mst):
     # Get the current time in the specified timezone
     now = datetime.now(mst)
 
-    # Calculate the next 30-minute interval
-    minutes = (now.minute // 30 + 1) * 30
+    # Calculate the next 60-minute interval
+    minutes = 60
     next_capture = now.replace(minute=0, second=0, microsecond=0) + timedelta(minutes=minutes)
 
     # If the calculated time is earlier than or equal to the current time (in case now is exactly at the start of a 30-minute interval)
