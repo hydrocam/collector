@@ -62,50 +62,39 @@ def disconnect_current_wifi():
         logging.error(f"Error disconnecting current Wi-Fi: {e}")
 
 
-def send_email(subject, body):
+def send_notification(subject, body):
     """
-    Sends an email using AWS SES.
+    Publishes a message to an SNS topic.
 
     Args:
-    subject (str): The subject of the email.
-    body (str): The body of the email.
+    subject (str): The subject of the notification.
+    body (str): The body of the notification.
 
     Returns:
     None
-
-    This function uses AWS Simple Email Service (SES) to send an email. The configuration details
-    (AWS credentials and email addresses) are read from a 'config.ini' file.
     """
     if not check_internet_connectivity():
         print("No Internet connectivity.")
         return
-        
+
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    ses_client = boto3.client('ses', region_name='us-west-1',
-                              aws_access_key_id=config['aws']['aws_access_key_id'],
-                              aws_secret_access_key=config['aws']['aws_secret_access_key'])
-    to_email = config['email']['receiver']
-
     try:
-        response = ses_client.send_email(
-            Source=config['email']['source'],  # Replace with your verified email
-            Destination={
-                'ToAddresses': [to_email]
-            },
-            Message={
-                'Subject': {
-                    'Data': subject
-                },
-                'Body': {
-                    'Text': {
-                        'Data': body
-                    }
-                }
-            }
-        )
-        logging.info(f"Email sent! Message ID: {response['MessageId']}")
+        sns_client = boto3.client('sns',
+                                  region_name='us-west-1',
+                                  aws_access_key_id=config['aws']['aws_access_key_id'],
+                                  aws_secret_access_key=config['aws']['aws_secret_access_key'])
 
-    except ClientError as e:
-        logging.error(f"Error sending email: {e.response['Error']['Message']}")
+        topic_arn = config['sns']['topic_arn']  
+
+        response = sns_client.publish(
+            TopicArn=topic_arn,
+            Subject=subject,
+            Message=body
+        )
+
+        logging.info(f"Notification sent via SNS! Message ID: {response['MessageId']}")
+
+    except Exception as e:
+        logging.error(f"Error sending SNS notification: {str(e)}")
